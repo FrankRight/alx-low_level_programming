@@ -6,4 +6,5 @@ int _putchar();
 #ifndef HEADERFILE_H2
 #define HEADERFILE_H2
 void print_alphabet();
+void print_alphabet_x10(void);
 #endif
