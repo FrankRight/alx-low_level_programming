@@ -9,7 +9,8 @@ int main(void)
 {
     int r;
 
-    r = print_sign(98);
+    r = print_sign(-98);
+    _putchar(r);
     _putchar(',');
     _putchar(' ');
     _putchar(r + '0');
