@@ -1,4 +1,4 @@
-#include "holberton.h"
+#include "main.h"
 int lengthc(char *s);
 int palindrome(char str[], int st, int end);
 /**
