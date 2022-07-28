@@ -1,300 +1,156 @@
-#include <stdlib.h>
-
+#include "main.h"
+#include <limits.h>
 /**
- * print_str - Print a given string
- * @str: String to print
+ * str_len - finds string length
+ * @str: input pointer to string
+ * Return: length of string
  */
-void print_str(char *str)
+int str_len(char *str)
 {
-int i;
+	int len;
 
-i = 0;
-while (str[i] != '\0')
-{
-_putchar(str[i]);
-i++;
+	for (len = 0; *str != '\0'; len++)
+		len++, str++;
+	return (len / 2);
 }
-_putchar('\n');
-}
-
-
 /**
- * print_err - Print the word "Error"
+ * _calloc - allocates memory for an array using malloc
+ * @bytes: bytes of memory needed per size requested
+ * @size: size in bytes of each element
+ * Return: pointer to the allocated memory
  */
-void print_err(void)
+void *_calloc(unsigned int bytes, unsigned int size)
 {
-_putchar('E');
-_putchar('r');
-_putchar('r');
-_putchar('o');
-_putchar('r');
-_putchar('\n');
-exit(98);
-}
+	unsigned int i;
+	char *p;
 
+	if (bytes == 0 || size == 0)
+		return (NULL);
+	if (size >= UINT_MAX / bytes || bytes >= UINT_MAX / size)
+		return (NULL);
+	p = malloc(size * bytes);
+	if (p == NULL)
+		return (NULL);
+	for (i = 0; i < bytes * size; i++)
+		p[i] = 0;
+	return ((void *)p);
+}
 /**
- * rev_string - Reverse the given string
- * @s: The string to reverse
- * @size: Size of string to revers;
- * Return: Nothing
+ * add_arrays - adds 2 arrays of ints
+ * @mul_result: pointer to array with numbers from product
+ * @sum_result: pointer to array with numbers from total sum
+ * @len_r: length of both arrays
+ * Return: void
  */
-void rev_string(char *s, int size)
+void add_arrays(int *mul_result, int *sum_result, int len_r)
 {
-char *str;
-int i, r;
+	int i = 0, len_r2 = len_r - 1, carry = 0, sum;
 
-str = malloc(size);
-if (str == NULL)
-print_err();
-i = 0;
-while (*(s + i) != 0)
-{
-str[i] = *(s + i);
-i++;
+	while (i < len_r)
+	{
+		sum = carry + mul_result[len_r2] + sum_result[len_r2];
+		sum_result[len_r2] = sum % 10;
+		carry = sum / 10;
+		i++;
+		len_r2--;
+	}
 }
-r = i - 1;
-i = 0;
-while (r > 0)
-{
-*(s + r) = str[i];
-r--;
-i++;
-}
-*(s + r) = str[i];
-free(str);
-}
-
 /**
-* str_len - Find the length of a given string
-* @str: String to find the length of
-*
-* Return: Length of the string
-*/
-unsigned int str_len(char *str)
+ * is_digit - checks for digits
+ * @c: input character to check for digit
+ * Return: 0 failure, 1 success
+ */
+int is_digit(char c)
 {
-unsigned int i;
-
-i = 0;
-while (str[i] != '\0')
-{
-i++;
+	if (c >= '0' && c <= '9')
+		return (1);
+	printf("Error\n");
+	return (0);
 }
-return (i);
-}
-
 /**
-* init - Initialize an array with 0
-* @arr: The array to initialize
-* @size: Size of the array
-*
-* Return: Pointer to array
-*/
-char *init(char *arr, int size)
+ * multiply - multiplies 2 #'s, prints result, must be 2 #'s
+ * @num1: factor # 1 (is the smaller of 2 numbers)
+ * @len_1: length of factor 1
+ * @num2: factor # 2 (is the larger of 2 numbers)
+ * @len_2: length of factor 2
+ * @len_r: length of result arrays
+ * Return: 0 fail, 1 success
+ */
+int *multiply(char *num1, int len_1, char *num2, int len_2, int len_r)
 {
-int i;
+	int i = 0, i1 = len_1 - 1;
+	int i2, product, carry, digit, *mul_result, *sum_result;
 
-i = 0;
-while (i < size)
-{
-arr[i] = '0';
-i++;
+	sum_result = _calloc(sizeof(int), (len_r));
+	while (i < len_1)
+	{
+		mul_result = _calloc(sizeof(int), len_r);
+		i2 = len_2 - 1, digit = (len_r - 1 - i);
+		if (!is_digit(num1[i1]))
+			return (NULL);
+		carry = 0;
+		while (i2 >= 0)
+		{
+			if (!is_digit(num2[i2]))
+				return (NULL);
+			product = (num1[i1] - '0') * (num2[i2] - '0');
+			product += carry;
+			mul_result[digit] += product % 10;
+			carry = product / 10;
+			digit--, i2--;
+		}
+		add_arrays(mul_result, sum_result, len_r);
+		free(mul_result);
+	    i++, i1--;
+	}
+	return (sum_result);
 }
-return (arr);
-}
-
 /**
-* _isstrdigit - Check if input is only numbers
-* @str: Given input to check
-*
-* Return: 1 if a number, 0 if otherwise
-*/
-int _isstrdigit(char *str)
+ * print_me - prints my array of the hopeful product here
+ * @sum_result: pointer to int array with numbers to add
+ * @len_r: length of result array
+ * Return: void
+ */
+void print_me(int *sum_result, int len_r)
 {
-int i;
+	int i = 0;
 
-i = 0;
-while (str[i] != '\0')
-{
-if (str[i] < '0' || str[i] > '9')
-return (0);
-i++;
+	while (sum_result[i] == 0 && i < len_r)
+		i++;
+	if (i == len_r)
+		_putchar('0');
+	while (i < len_r)
+		_putchar(sum_result[i++] + '0');
+	_putchar('\n');
 }
-return (1);
-}
-
 /**
-* mul - Multiply two strings together
-* @num1: The first number, as a string
-* @num2: The second number, as a string
-* @len1: The length of the first string
-* @len2: The length of the second string
-*
-* Return: Pointer to char array
-*/
-char *mul(char *num1, char *num2, int len1, int len2)
+ * main - multiply 2 input #'s of large lengths and print result or print Error
+ * @argc: input count of args
+ * @argv: input array of string args
+ * Return: 0, Success
+ */
+int main(int argc, char **argv)
 {
-int i, prod, j, carry, k, digit, reslen;
-char *res;
+	int len_1, len_2, len_r, temp, *sum_result;
+	char *num1, *num2;
 
-reslen = len1 + len2 + 1;
-res = malloc(reslen * sizeof(char));
-if (res == NULL)
-print_err();
-res = init(res, reslen);
-i = len2 - 1; carry = k = digit = 0;
-while (i >= 0 && k < (len1 + len2))
-{
-j = len1 - 1;
-k = digit;
-while (j >= 0)
-{
-carry = 0;
-prod = (num1[j] - '0') * (num2[i] - '0');
-if (prod > 9)
-carry += prod / 10;
-prod = prod % 10;
-if (((res[k] - '0') + prod) > 9)
-{
-carry += 1;
-res[k] += (prod - 10);
-}
-else
-res[k] += prod;
-res[k + 1] += carry;
-k++; j--;
-}
-i--; digit++;
-}
-if (res[k] == '0')
-res[k] = '\0';
-else
-res[k + 1] = '\0';
-return (res);
-}
-
-/**
-* remove_zeroes - Remove zeroes from num
-* @str: String to remove zeroes from
-* @len: Length of string
-*
-* Return: Pointer to new string
-*/
-char *remove_zeroes(char *str, int len)
-{
-int i, j;
-char *nstr;
-
-i = 0;
-while (str[i] == '0' && str[i] != '\0')
-{
-i++;
-}
-if (len - i == 0)
-{
-nstr = malloc(2 * sizeof(*nstr));
-nstr[0] = '0';
-nstr[1] = '\0';
-return (nstr);
-}
-else
-len -= i;
-nstr = malloc(len * sizeof(*nstr) + 1);
-j = 0;
-while (j < len)
-{
-nstr[j] = str[i];
-j++;
-i++;
-}
-nstr[j] = '\0';
-return (nstr);
-}
-
-/**
-* check_zero - Check to see if the number is zero or if zeroes need to be gone
-* @str: Str to check for zeroes
-* @len: len of string
-*
-* Return: Pointer to new num string
-*/
-char *check_zero(char *str, int len)
-{
-char *num;
-int i;
-
-if (str[0] == '0' && len != 1)
-num = remove_zeroes(str, len);
-else if (str[0] == '0' && len == 1)
-{
-num = malloc(len + 1);
-if (num == NULL)
-print_err();
-num[0] = '0';
-num[1] = '\0';
-}
-else
-{
-num = malloc(len + 1);
-if (num == NULL)
-print_err();
-i = 0;
-while (i < len)
-{
-num[i] = str[i];
-i++;
-}
-num[i] = '\0';
-}
-return (num);
-}
-
-/**
-* main - Run all necessary functions to multply two strings as numbers
-* @argc: Number of args
-* @argv: Value of args
-*
-* Return: 0 on success
-*/
-int main(int argc, char *argv[])
-{
-int len1, len2, anslen;
-char *ans, *num1, *num2;
-
-if (argc != 3)
-{
-print_err();
-exit(98);
-}
-if (_isstrdigit(argv[1]) == 0 || _isstrdigit(argv[2]) == 0)
-{
-print_err();
-exit(98);
-}
-len1 = str_len(argv[1]);
-len2 = str_len(argv[2]);
-num1 = check_zero(argv[1], len1);
-if (*num1 == '0')
-{
-_putchar('0');
-_putchar('\n');
-return (0);
-}
-num2 = check_zero(argv[2], len2);
-if (*num2 == '0')
-{
-_putchar('0');
-_putchar('\n');
-return (0);
-}
-len1 = str_len(num1);
-len2 = str_len(num2);
-if (len1 > len2)
-ans = mul(num1, num2, len1, len2);
-else
-ans = mul(num2, num1, len2, len1);
-anslen = str_len(ans);
-rev_string(ans, anslen);
-print_str(ans);
-free(ans); free(num1); free(num2);
-return (0);
+	if (argc != 3)
+	{
+		printf("Error\n");
+		exit(98);
+	}
+	len_1 = str_len(argv[1]), len_2 = str_len(argv[2]);
+	len_r = len_1 + len_2;
+	if (len_1 < len_2)
+		num1 = argv[1], num2 = argv[2];
+	else
+	{
+		num1 = argv[2], num2 = argv[1];
+		temp = len_2, len_2 = len_1, len_1 = temp;
+	}
+	sum_result = multiply(num1, len_1, num2, len_2, len_r);
+	if (sum_result == NULL)
+		exit(98);
+	print_me(sum_result, len_r);
+	return (0);
 }
