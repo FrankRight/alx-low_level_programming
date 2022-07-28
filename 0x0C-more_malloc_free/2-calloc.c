@@ -1,26 +1,28 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include "main.h"
+
 /**
- * _calloc - print 0s into 2D grid
- * @nmemb: array num
- * @size: size of ea array element
- * Return: 0
+ * _calloc - Allocate memory for array of nmemb elements of size bytes
+ * @nmemb: Number of elemnts
+ * @size: Size in bytes of elements
+ *
+ * Return: Pointer to new memory, NULL if it fails
  */
 void *_calloc(unsigned int nmemb, unsigned int size)
 {
-	char *arr;
-	unsigned int i;
+	char *ar;
+	unsigned int ar_size, i;
 
 	if (nmemb == 0 || size == 0)
 		return (NULL);
-
-	arr = malloc(nmemb * size);
-	if (arr == NULL)
+	ar_size = nmemb * size;
+	ar = malloc(ar_size);
+	if (ar == NULL)
 		return (NULL);
-
-	for (i = 0; i < (nmemb * size); i++)
-		arr[i] = 0;
-
-	return (arr);
+	while (i < ar_size)
+	{
+		ar[i] = 0;
+		i++;
+	}
+	return (ar);
 }
