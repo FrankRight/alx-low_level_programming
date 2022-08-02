@@ -1,1 +1,1 @@
-# Files for structs and typedef.
+# Files for structs and typedef
